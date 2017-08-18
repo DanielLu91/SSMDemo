@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="database.dao.StudentMapper">
+  <resultMap id="BaseResultMap" type="database.pojo.Student">
+    <id column="st_id" jdbcType="INTEGER" property="stId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="course_id" jdbcType="INTEGER" property="courseId" />
+    <association property="course" resultMap="BaseCourseMap"></association>
+  </resultMap>
+
+  <resultMap id="BaseCourseMap" type="database.pojo.Course">
+    <id column="course_id" jdbcType="INTEGER" property="courseId" />
+    <result column="course_name" jdbcType="VARCHAR" property="courseName" />
+    <result column="tutor_id" jdbcType="INTEGER" property="tutorId" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    st_id, name, email, course_id
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from Student
+    where st_id = #{stId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from Student
+    where st_id = #{stId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="database.pojo.Student">
+    insert into Student (st_id, name, email, 
+      course_id)
+    values (#{stId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
+      #{courseId,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="database.pojo.Student">
+    insert into Student
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="stId != null">
+        st_id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="email != null">
+        email,
+      </if>
+      <if test="courseId != null">
+        course_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="stId != null">
+        #{stId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="courseId != null">
+        #{courseId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="database.pojo.Student">
+    update Student
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="courseId != null">
+        course_id = #{courseId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where st_id = #{stId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="database.pojo.Student">
+    update Student
+    set name = #{name,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      course_id = #{courseId,jdbcType=INTEGER}
+    where st_id = #{stId,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectStudentWithCourseByStudentId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select S.st_id, S.name, S.email, S.course_id,
+    C.course_id, C.course_name
+    FROM Student AS S INNER JOIN Course AS C
+    ON S.course_id=C.course_id WHERE S.st_id=#{stId,jdbcType=INTEGER}
+  </select>
+</mapper>

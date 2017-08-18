@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="database.dao.TutorMapper">
+  <resultMap id="BaseResultMap" type="database.pojo.Tutor">
+    <id column="tutor_id" jdbcType="INTEGER" property="tutorId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <collection property="courseList" resultMap="BaseCourseMap"></collection>
+  </resultMap>
+
+  <resultMap id="BaseCourseMap" type="database.pojo.Course">
+    <id column="course_id" jdbcType="INTEGER" property="courseId" />
+    <result column="course_name" jdbcType="VARCHAR" property="courseName" />
+    <result column="tutor_id" jdbcType="INTEGER" property="tutorId" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    tutor_id, name, email
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from Tutor
+    where tutor_id = #{tutorId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from Tutor
+    where tutor_id = #{tutorId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="database.pojo.Tutor">
+    insert into Tutor (tutor_id, name, email
+      )
+    values (#{tutorId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="database.pojo.Tutor">
+    insert into Tutor
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="tutorId != null">
+        tutor_id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="email != null">
+        email,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="tutorId != null">
+        #{tutorId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        #{email,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="database.pojo.Tutor">
+    update Tutor
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where tutor_id = #{tutorId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="database.pojo.Tutor">
+    update Tutor
+    set name = #{name,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR}
+    where tutor_id = #{tutorId,jdbcType=INTEGER}
+  </update>
+  
+  <select id="selectTutorWithCoursesWithTutorName" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select T.tutor_id, T.name, T.email, C.course_name
+    from Tutor AS T INNER JOIN Course AS C on T.tutor_id=C.tutor_id
+    where T.name=#{name,jdbcType=VARCHAR};
+  </select>
+</mapper>
